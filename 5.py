@@ -4,7 +4,6 @@ import pickle
 import os
 import telegram
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
-from telegram.constants import ParseMode
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -19,6 +18,7 @@ TOKEN = "7612547079:AAEzbQEcHRD4dprHogr5JLY5ScOEoCCjT8o"
 DATA_FILE = "user_data.pkl"
 SELECT_ITEM, ENTER_TRADE_LINK, ENTER_DEPOSIT_AMOUNT, SELL_ITEMS, SELL_SELECTED, WAITING_DEPOSIT_AMOUNT, WAITING_SUPPORT_MESSAGE = range(7)
 ADMIN_ID = 1473801995
+
 def load_data():
     if os.path.exists(DATA_FILE):
         try:
@@ -28,11 +28,9 @@ def load_data():
             pass
     return {'users_db': {}, 'trade_links': {}, 'last_daily_bonus': {}}
 
-
 def save_data(data):
     with open(DATA_FILE, 'wb') as f:
         pickle.dump(data, f)
-
 
 data = load_data()
 users_db = data['users_db']
@@ -47,11 +45,11 @@ RARITY_COVERT = "♦️ Тайное"
 RARITY_RARE = "🔶 Крайне редкий предмет или контрабандное"
 
 RARITIES = {
-    RARITY_COMMON: {"chance": 50.0, "multiplier": 1},  # 50%
-    RARITY_MILSPEC: {"chance": 30.0, "multiplier": 1},       # 30%
-    RARITY_RESTRICTED: {"chance": 10.0, "multiplier": 1},              # 10%
-    RARITY_CLASSIFIED: {"chance": 5.0, "multiplier": 1},             # 5%
-    RARITY_COVERT: {"chance": 1.0, "multiplier": 1},                   # 3%
+    RARITY_COMMON: {"chance": 50.0, "multiplier": 1},
+    RARITY_MILSPEC: {"chance": 30.0, "multiplier": 1},
+    RARITY_RESTRICTED: {"chance": 10.0, "multiplier": 1},
+    RARITY_CLASSIFIED: {"chance": 5.0, "multiplier": 1},
+    RARITY_COVERT: {"chance": 1.0, "multiplier": 1},
     RARITY_RARE: {"chance": 0.89, "value_mult": 1}
 }
 
@@ -60,7 +58,7 @@ CASES = {
         "price": 300,
         "items": [
             ("AK-47 | Пожелание на ночь", RARITY_COVERT, 3000, "https://community.akamai.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJemkV09K_k4ifgP7nO4Tdn2xZ_Pp9i_vG8MKliwDh80I-Nmn6INOXIFI5YlqCrwK_ybu90cfovsvOyCBiuiEqtCnfgVXp1iNhGu0F"),
-            ("MP9 | Звёздный защитник", RARITY_COVERT, 3000, "https://community.akamai.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou6r8FABz7P7YKAJR-N2kmImMn-PLP7LWnn9u5MRjjeyPotXx2g3h_UM_ZGigINTEdw88aVrUqVDvwLvs1J69u5-amnVhvClwsGGdwUKxD8sm0Q"),
+            ("MP9 | Звёздный защитник", RARITY_COVERT, 3000, "https://community.akamai.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou6r8FABz7P7YKAJR-N2kmImMn-PLP7LWnn9u5MRjjeyPotXx2g3h_UM_ZGigINTEdw88aVrUqVDvwLvs1J69u5famnVhvClwsGGdwUKxD8sm0Q"),
             ("Dual Berettas | Плод воображения", RARITY_CLASSIFIED, 1000, "https://community.akamai.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpos7asPwJf0Ob3dDFL-Nmlq4KOgPbmNoTdn2xZ_Pp9i_vG8MKmiQDh-kRsYmmmJoWScwU4N1GDqQC7kuvmhsTp6cmdwHYyuHEitH7YgVXp1r6aPbAJ"),
             ("MP7 | Дух бездны", RARITY_CLASSIFIED, 1000, "https://community.akamai.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou6ryFAR17P7YJgJE6d2kq4yCkP_gDLfQhGxUppQmjL-RrY_w3wSy_0c9NWn6d4fEewRtZFzR_lK-ye7rgZS17cjLnXR9-n51k7vdI74"),
             ("FAMAS | Быстрые движения глаз", RARITY_CLASSIFIED, 1000, "https://community.akamai.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposLuoKhRf1OD3dzxP7c-JhoGbnvPLNqLUhVRd4cJ5ntbN9J7yjRrsqkJqZTz1cIWTcwQ_M1nWrgXqku_u15_t78zAzSZm6SUm5C3dzRCxn1gSObQrE_CU"),
@@ -86,7 +84,6 @@ CASES = {
     }
 }
 
-
 async def back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -102,7 +99,6 @@ async def back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await start(update, context)
 
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if user_id not in users_db:
@@ -113,7 +109,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🎁 Открыть кейс", callback_data='select_case')],
         [InlineKeyboardButton("💰 Баланс", callback_data='balance'),
          InlineKeyboardButton("📦 Инвентарь", callback_data='inventory')],
-        [InlineKeyboardButton("📤 Вывод предметов", callback_data='withdraw_items')],  # Теперь одна кнопка в ряду
+        [InlineKeyboardButton("📤 Вывод предметов", callback_data='withdraw_items')],
         [InlineKeyboardButton("🎰 Ежедневный бонус", callback_data='daily_bonus')],
         [InlineKeyboardButton("🆘 О боте", callback_data='help')],
     ]
@@ -127,12 +123,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     else:
         await update.message.reply_text(
-            "🔫 CS2 Case Bot\n\n"
+            "🔫 CS2 SKIN-HUNTER BOT\n\n"
             f"💰 Баланс: {users_db[user_id]['balance']}₽\n"
             f"📦 Предметов: {len(users_db[user_id]['inventory'])}",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
-
 
 async def select_case(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -147,7 +142,6 @@ async def select_case(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🎁 Выберите кейс для открытия:",
         reply_markup=InlineKeyboardMarkup(keyboard))
 
-
 async def cancel_operation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.pop('current_handler', None)
 
@@ -159,7 +153,6 @@ async def cancel_operation(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Операция отменена.")
 
     return ConversationHandler.END
-
 
 async def process_deposit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
@@ -193,7 +186,6 @@ async def process_deposit(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ])
         )
         return ENTER_DEPOSIT_AMOUNT
-
 
 def create_deposit_handler():
     return ConversationHandler(
@@ -240,7 +232,6 @@ def create_support_handler():
         per_message=True
     )
 
-
 async def support_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['current_handler'] = 'support'
 
@@ -261,7 +252,6 @@ async def support_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     return WAITING_SUPPORT_MESSAGE
 
-
 async def cancel_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.pop('support_started_from_button', None)
 
@@ -273,7 +263,6 @@ async def cancel_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Отправка сообщения отменена.")
 
     return ConversationHandler.END
-
 
 async def start_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['awaiting_support'] = True
@@ -297,33 +286,21 @@ async def start_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     return WAITING_SUPPORT_MESSAGE
 
-
 async def handle_support_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Обработка сообщения в поддержку"""
-    try:
-        # Удаляем флаг
-        context.user_data.pop('support_started_from_button', None)
+    context.user_data.pop('support_started_from_button', None)
 
-        user = update.effective_user
-        message_text = update.message.text
+    user = update.effective_user
+    message_text = update.message.text
 
-        # Отправка админу
-        await context.bot.send_message(
-            chat_id=ADMIN_ID,
-            text=f"🆘 Поддержка от {user.full_name} (@{user.username}, ID: {user.id}):\n\n{message_text}"
-        )
+    await context.bot.send_message(
+        chat_id=ADMIN_ID,
+        text=f"🆘 Поддержка от {user.full_name} (@{user.username}, ID: {user.id}):\n\n{message_text}"
+    )
 
-        # Подтверждение пользователю
-        await update.message.reply_text(
-            "✅ Ваше сообщение отправлено в техподдержку!",
-            reply_markup=ReplyKeyboardRemove()
-        )
-
-    except Exception as e:
-        print(f"Ошибка поддержки: {e}")
-        await update.message.reply_text(
-            "❌ Произошла ошибка при отправке сообщения. Пожалуйста, попробуйте позже."
-        )
+    await update.message.reply_text(
+        "✅ Ваше сообщение отправлено в техподдержку!",
+        reply_markup=ReplyKeyboardRemove()
+    )
 
     return ConversationHandler.END
 
@@ -360,7 +337,6 @@ async def withdraw_item(update: Update, context: ContextTypes.DEFAULT_TYPE):
     item, rarity, value, *_ = users_db[user_id]["inventory"].pop(item_index)
     save_data(data)
 
-
 async def enter_trade_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     trade_link = update.message.text
@@ -385,7 +361,6 @@ async def enter_trade_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]))
     return ConversationHandler.END
 
-
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start(update, context)
     return ConversationHandler.END
@@ -399,7 +374,7 @@ async def back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🎁 Открыть кейс", callback_data='select_case')],
         [InlineKeyboardButton("💰 Баланс", callback_data='balance'),
          InlineKeyboardButton("📦 Инвентарь", callback_data='inventory')],
-        [InlineKeyboardButton("📤 Вывод предметов", callback_data='withdraw_items')],  # Теперь одна кнопка в ряду
+        [InlineKeyboardButton("📤 Вывод предметов", callback_data='withdraw_items')],
         [InlineKeyboardButton("🎰 Ежедневный бонус", callback_data='daily_bonus')],
         [InlineKeyboardButton("🆘 Помощь", callback_data='help')],
     ]
@@ -411,8 +386,6 @@ async def back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"💰 Баланс: {users_db[user_id]['balance']}₽\n"
         f"📦 Предметов: {len(users_db[user_id]['inventory'])}",
         reply_markup=InlineKeyboardMarkup(keyboard))
-
-
 
 async def show_balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -433,12 +406,10 @@ async def show_balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"📦 Предметов: {len(users_db[user_id]['inventory'])}",
         reply_markup=InlineKeyboardMarkup(keyboard))
 
-
 async def deposit_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    # Устанавливаем состояние
     context.user_data['current_handler'] = 'deposit'
 
     await query.edit_message_text(
@@ -454,11 +425,8 @@ async def open_case(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     user_id = update.effective_user.id
 
-    # Получаем название кейса из данных callback
     case_name = query.data.split('_', 2)[2]
-    print(f"Обрабатываем кейс: {case_name}")  # для отладки
 
-    # Проверяем наличие кейса в словаре CASES
     if case_name not in CASES:
         await safe_edit_or_send_text(
             query,
@@ -470,7 +438,6 @@ async def open_case(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     case_data = CASES[case_name]
 
-    # Проверка баланса пользователя
     if users_db[user_id]["balance"] < case_data["price"]:
         await safe_edit_or_send_text(
             query,
@@ -480,21 +447,17 @@ async def open_case(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Снимаем стоимость кейса со счета
     users_db[user_id]["balance"] -= case_data["price"]
 
     items = case_data["items"]
     weights = [RARITIES[item[1]]["chance"] for item in items]
 
-    # Выбираем случайный предмет с учетом весов
     selected_item = random.choices(items, weights=weights, k=1)[0]
     name, rarity, value, image_url = selected_item
 
-    # Добавляем предмет в инвентарь
     users_db[user_id]["inventory"].append((name, rarity, value, image_url))
     save_data(data)
 
-    # Отправляем результат пользователю
     await context.bot.send_photo(
         chat_id=update.effective_chat.id,
         photo=image_url,
@@ -511,23 +474,16 @@ async def open_case(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🔙 Назад", callback_data='back_to_menu')]
         ])
     )
-
-
 async def show_inventory_from_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Открывает инвентарь в новом сообщении после открытия кейса"""
+
     query = update.callback_query
     await query.answer()
-
-    # Удаляем клавиатуру из предыдущего сообщения
     await query.edit_message_reply_markup(reply_markup=None)
-
-    # Создаём новое сообщение с инвентарём
     await send_inventory_message(update.effective_chat.id, context)
 
 
 async def send_inventory_message(chat_id, context):
-    """Отправляет сообщение с инвентарём"""
-    user_id = context._user_id  # Получаем user_id из контекста
+    user_id = context._user_id
     inventory = users_db[user_id]["inventory"]
 
     if not inventory:
@@ -540,22 +496,21 @@ async def send_inventory_message(chat_id, context):
         )
         return
 
-    # Разбиваем инвентарь на части
+
     chunk_size = 15
     chunks = [inventory[i:i + chunk_size] for i in range(0, len(inventory), chunk_size)]
 
-    # Отправляем первую страницу
     await send_inventory_page(chat_id, context, chunks, 0)
 
 
 async def send_inventory_page(chat_id, context, chunks, page):
-    """Отправляет одну страницу инвентаря"""
+
     text = f"📦 Ваш инвентарь (страница {page + 1}/{len(chunks)}):\n\n"
     for idx, item in enumerate(chunks[page], 1):
         name, rarity, value, *_ = item
         text += f"{idx}. {name} ({rarity}) — {value}₽\n"
 
-    # Создаём клавиатуру
+
     buttons = []
     if len(chunks) > 1:
         nav_buttons = []
@@ -572,7 +527,7 @@ async def send_inventory_page(chat_id, context, chunks, page):
         [InlineKeyboardButton("🔙 Назад", callback_data='back_to_menu')]
     ])
 
-    # Отправляем новое сообщение
+
     await context.bot.send_message(
         chat_id=chat_id,
         text=text,
@@ -590,7 +545,7 @@ async def safe_edit_or_send_text(query, context, text, reply_markup=None):
                 reply_markup=reply_markup)
         else:
             raise
-# ... (все ваши существующие функции остаются без изменений до show_inventory) ...
+
 
 async def show_inventory(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -607,11 +562,10 @@ async def show_inventory(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Разбиваем инвентарь на части по 20 предметов
     chunk_size = 20
     inventory_chunks = [inventory[i:i + chunk_size] for i in range(0, len(inventory), chunk_size)]
 
-    # Отправляем первую часть
+
     await send_inventory_chunk(query, context, inventory_chunks, 0)
 
 
@@ -660,10 +614,9 @@ async def toggle_item(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     user_id = update.effective_user.id
 
-    # Получаем индекс выбранного предмета
     item_index = int(query.data.split('_')[1])
 
-    # Обновляем список выбранных предметов
+
     selected_items = context.user_data.setdefault('selected_items', [])
 
     if item_index in selected_items:
@@ -671,7 +624,7 @@ async def toggle_item(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         selected_items.append(item_index)
 
-    # Перестраиваем интерфейс выбора
+
     inventory = users_db[user_id]["inventory"]
     keyboard = []
     for idx, (item, rarity, value, *_) in enumerate(inventory, 1):
@@ -706,7 +659,7 @@ async def confirm_sell(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return SELL_SELECTED
 
     total = 0
-    # Сортируем в обратном порядке для корректного удаления
+
     for index in sorted(context.user_data['selected_items'], reverse=True):
         if 0 <= index < len(users_db[user_id]["inventory"]):
             total += users_db[user_id]["inventory"][index][2]
@@ -714,7 +667,7 @@ async def confirm_sell(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     users_db[user_id]["balance"] += total
     save_data(data)
-    context.user_data['selected_items'] = []  # Очищаем выбор
+    context.user_data['selected_items'] = []
 
     await query.edit_message_text(
         f"✅ Продано предметов на сумму: {total}₽\n"
@@ -789,7 +742,7 @@ async def daily_bonus(update: Update, context: ContextTypes.DEFAULT_TYPE):
     now = time.time()
     last_bonus = LAST_DAILY_BONUS.get(user_id, 0)
 
-    if now - last_bonus < 24 * 60 * 60:  # 24 часа
+    if now - last_bonus < 24 * 60 * 60:
         await query.edit_message_text(
             "❌ Вы уже получали бонус сегодня!\n"
             "Приходите завтра.",
@@ -829,7 +782,6 @@ async def handle_unexpected_text(update: Update, context: ContextTypes.DEFAULT_T
 
 
 async def cancel_deposit(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Отмена пополнения баланса"""
     if update.callback_query:
         query = update.callback_query
         await query.answer()
@@ -867,7 +819,7 @@ async def support_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    # Устанавливаем флаг, что пользователь начал диалог с поддержки
+
     context.user_data['support_started_from_button'] = True
 
     await query.edit_message_text(
@@ -880,7 +832,7 @@ async def support_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return WAITING_SUPPORT_MESSAGE
 
 async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Общий обработчик команды /cancel"""
+
     if 'awaiting_support' in context.user_data:
         return await cancel_support(update, context)
 
@@ -890,11 +842,8 @@ async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     return ConversationHandler.END
 
-
-
-
 async def admin_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Ответ администратора пользователю"""
+
     if update.effective_user.id != ADMIN_ID:
         return
 
@@ -917,12 +866,12 @@ async def admin_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     application = ApplicationBuilder().token(TOKEN).build()
 
-    # Основные команды
+
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("support", start_support))
     application.add_handler(CommandHandler("reply", admin_reply))
 
-    # Обработчики кнопок
+
     application.add_handler(CallbackQueryHandler(select_case, pattern='^select_case$'))
     application.add_handler(CallbackQueryHandler(open_case, pattern='^open_case_'))
     application.add_handler(CallbackQueryHandler(show_inventory, pattern='^inventory$'))
@@ -973,15 +922,12 @@ def main():
         fallbacks=[
             CommandHandler('cancel', cancel_support),
             CallbackQueryHandler(cancel_support, pattern='^cancel_support$'),
-            MessageHandler(filters.REPLY, handle_support_message)  # Обработка reply-сообщений
+            MessageHandler(filters.REPLY, handle_support_message)
         ],
         per_message=True,
         allow_reentry=True
     )
-    # ВАЖНО: добавляем поддержку перед остальными обработчиками!
     application.add_handler(support_conv_handler)
-
-
 
     withdraw_conv_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(withdraw_items_start, pattern='^withdraw_items$')],
@@ -996,7 +942,7 @@ def main():
     support_conv_handler = ConversationHandler(
         entry_points=[
             CommandHandler('support', start_support),
-            CallbackQueryHandler(support_button, pattern='^ask_support$')  # Изменили на support_button
+            CallbackQueryHandler(support_button, pattern='^ask_support$')
         ],
         states={
             WAITING_SUPPORT_MESSAGE: [
@@ -1014,15 +960,12 @@ def main():
         allow_reentry=True
     )
 
-    # Регистрация остальных обработчиков
     application.add_handler(deposit_conv_handler)
     application.add_handler(withdraw_conv_handler)
     application.add_handler(support_conv_handler)
-
-    # Обработчик для неожиданных текстовых сообщений (например, просто написать что-то)
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_unexpected_text))
 
-    print("Бот запущен...")
+    print("WW")
     application.run_polling()
 
 if __name__ == '__main__':
